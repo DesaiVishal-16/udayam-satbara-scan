@@ -54,7 +54,6 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
 
   const loadRecords = async () => {
     const dbRecords = await getRecords();
-    console.log('Loaded DB records:', dbRecords);
     const pending: PendingRecord[] = dbRecords.map(r => ({
       ...r,
       fileUrl: (r as any).file_url,
@@ -128,9 +127,7 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
 
       try {
         const base64 = await fileToBase64(file);
-        console.log('Extracting with AI...');
         const data = await extractLandRecord(base64, file.type);
-        console.log('Extraction complete:', data);
 
         const newRecord: PendingRecord = {
           id: generateId(),
@@ -150,12 +147,6 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
         saveRecord({
           ...newRecord,
           file_url: newRecord.fileUrl,
-        }).then(saved => {
-          if (saved) {
-            console.log('DB save success:', saved.id);
-          } else {
-            console.log('DB save failed (but showing locally)');
-          }
         });
         
         addNotification('success', `Extracted: ${file.name}`);

@@ -54,7 +54,6 @@ export default function App() {
         confidenceScore: r.confidenceScore,
       }));
       setHistory(mapped);
-      console.log('Loaded initial records:', mapped.length);
     } catch (err) {
       console.error('Failed to load initial records:', err);
     } finally {

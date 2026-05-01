@@ -89,7 +89,6 @@ export const extractLandRecord = async (fileBase64: string, mimeType: string) =>
     });
 
     const text = response.text?.trim();
-    console.log('AI Response:', text?.substring(0, 500) + '...');
     
     if (!text) {
       throw new Error("Empty response from AI");

@@ -4,9 +4,6 @@ import { LandRecord } from '@/types';
 export type DbRecord = Omit<LandRecord, 'fileUrl'> & { file_url?: string };
 
 export async function saveRecord(record: DbRecord): Promise<DbRecord | null> {
-  console.log('=== SAVE RECORD START ===');
-  console.log('Record ID (before):', record.id);
-  
   const insertData = {
     file_name: record.fileName,
     file_url: record.file_url || null,
@@ -30,9 +27,6 @@ export async function saveRecord(record: DbRecord): Promise<DbRecord | null> {
     is_edited: (record as any).isEdited || false,
   };
   
-  console.log('Insert data:', JSON.stringify(insertData, null, 2));
-  
-  // Let Supabase auto-generate the UUID
   const { data, error } = await supabase
     .from('land_records')
     .insert(insertData)
@@ -40,15 +34,9 @@ export async function saveRecord(record: DbRecord): Promise<DbRecord | null> {
     .single();
 
   if (error) {
-    console.error('=== SAVE ERROR ===');
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
-    console.error('Error details:', error.details);
-    console.error('Error hint:', error.hint);
+    console.error('Save error:', error.message);
     return null;
   }
-  console.log('=== SAVE SUCCESS ===');
-  console.log('Saved data:', data);
   return mapDbRecord(data);
 }
 
@@ -81,24 +69,22 @@ export async function updateRecord(id: string, updates: Partial<DbRecord>): Prom
     .eq('id', id);
 
   if (error) {
-    console.error('Update error:', error);
+    console.error('Update error:', error.message);
     return false;
   }
   return true;
 }
 
 export async function getRecords(): Promise<DbRecord[]> {
-  console.log('=== GET RECORDS ===');
   const { data, error } = await supabase
     .from('land_records')
     .select('*')
     .order('extraction_date', { ascending: false });
 
   if (error) {
-    console.error('Fetch error:', error);
+    console.error('Fetch error:', error.message);
     return [];
   }
-  console.log('Fetched records:', data?.length || 0);
   return (data || []).map(mapDbRecord);
 }
 
@@ -109,7 +95,7 @@ export async function deleteRecord(id: string, filePath?: string): Promise<boole
     .eq('id', id);
 
   if (error) {
-    console.error('Delete error:', error);
+    console.error('Delete error:', error.message);
     return false;
   }
   return true;

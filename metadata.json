@@ -1,0 +1,6 @@
+{
+  "name": "MahaLand Extract",
+  "description": "Intelligent Maharashtra 7/12 (Satbara) extraction and analysis tool for land records.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["AI OCR", "Land Record Analysis", "Excel Export"]
+}

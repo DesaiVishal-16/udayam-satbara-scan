@@ -47,8 +47,15 @@ export function HistoryView({ records, onDelete, loading }: {
   }, [records]);
 
   const holdingTypes = useMemo(() => {
-    const set = new Set(records.map(r => (r.landHoldingType || '').trim()).filter(Boolean));
-    return Array.from(set).sort();
+    const seen = new Map<string, string>();
+    for (const record of records) {
+      const val = (record.landHoldingType || '').trim().replace(/\s+/g, ' ');
+      const key = val.toLowerCase().replace(/\s+/g, '');
+      if (val && !seen.has(key)) {
+        seen.set(key, val);
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) => a.localeCompare(b, 'mr'));
   }, [records]);
 
   const filteredRecords = useMemo(() => {
@@ -60,8 +67,8 @@ export function HistoryView({ records, onDelete, loading }: {
       const s = searchTerm.toLowerCase();
 
       const matchesSearch = v.includes(s) || t.includes(s) || d.includes(s) || f.includes(s);
-      const matchesVillage = villageFilter === 'all' || record.village === villageFilter;
-      const matchesHolding = holdingFilter === 'all' || record.landHoldingType === holdingFilter;
+      const matchesVillage = villageFilter === 'all' || (record.village || '').toLowerCase() === villageFilter.toLowerCase();
+      const matchesHolding = holdingFilter === 'all' || ((record.landHoldingType || '').trim().replace(/\s+/g, ' ').toLowerCase().replace(/\s+/g, '') === holdingFilter.toLowerCase().replace(/\s+/g, ''));
       const matchesFragment = fragmentFilter === 'all' || (fragmentFilter === 'yes' ? record.fragmentRestriction : !record.fragmentRestriction);
       const matchesCeiling = ceilingFilter === 'all' || (ceilingFilter === 'yes' ? record.ceiling : !record.ceiling);
       const matchesForest = forestFilter === 'all' || (forestFilter === 'yes' ? record.forest : !record.forest);

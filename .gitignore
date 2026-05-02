@@ -10,13 +10,10 @@ build/
 .cache/
 
 # Environment
-.env
-.env.local
 .env.*.local
 
 # IDE
 .idea/
-.vscode/
 *.swp
 *.swo
 
@@ -34,3 +31,4 @@ coverage/
 # Misc
 *.bak
 *.tmp
+config.bat

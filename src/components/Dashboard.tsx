@@ -43,25 +43,15 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
   const [files, setFiles] = useState<File[]>([]);
   const [records, setRecords] = useState<PendingRecord[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
+  
   const [progress, setProgress] = useState({ current: 0, total: 0 });
   const [notifications, setNotifications] = useState<{ id: string; type: 'success' | 'error' | 'warning'; message: string }[]>([]);
 
   useEffect(() => {
     createStorageBucket();
-    loadRecords();
   }, []);
 
-  const loadRecords = async () => {
-    const dbRecords = await getRecords();
-    const pending: PendingRecord[] = dbRecords.map(r => ({
-      ...r,
-      fileUrl: (r as any).file_url,
-      status: 'completed',
-      isEdited: (r as any).isEdited || false,
-    }));
-    setRecords(pending);
-  };
+  
 
   const addNotification = (type: 'success' | 'error' | 'warning', message: string) => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -71,15 +61,7 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
     }, 5000);
   };
 
-  const filteredRecords = useMemo(() => {
-    if (!searchTerm) return records;
-    const s = searchTerm.toLowerCase();
-    return records.filter(r => 
-      (r.fileName || '').toLowerCase().includes(s) || 
-      (r.village || '').toLowerCase().includes(s) || 
-      (r.taluka || '').toLowerCase().includes(s)
-    );
-  }, [records, searchTerm]);
+  const filteredRecords = useMemo(() => records, [records]);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     const newFiles = acceptedFiles.filter(file => !files.find(f => f.name === file.name));
@@ -253,7 +235,7 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">Extraction Dashboard</h2>
-          <p className="text-slate-500 text-sm mt-1">Automatic 7/12 Document Extraction and Batch Management</p>
+          
         </div>
         <div className="flex items-center gap-3">
           <button 
@@ -402,24 +384,7 @@ export default function Dashboard({ onRecordSaved }: { onRecordSaved: (record: L
 
         {/* Right Column - Results Table */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Search & Filter */}
-          {records.length > 0 && (
-            <div className="flex items-center gap-4">
-              <div className="relative flex-1 max-w-md">
-                <FileSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <Input 
-                  placeholder="Filter records..." 
-                  className="h-10 pl-10 text-sm border-slate-200"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-              <div className="flex items-center gap-2 text-xs text-slate-500">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                <span className="font-semibold uppercase tracking-wider">Authenticated OCR</span>
-              </div>
-            </div>
-          )}
+          
 
           {filteredRecords.length > 0 ? (
             <div className="tech-card overflow-hidden">

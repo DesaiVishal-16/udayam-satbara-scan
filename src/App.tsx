@@ -31,7 +31,15 @@ export default function App() {
   const loadInitialRecords = async () => {
     try {
       const records = await getRecords();
-      const mapped: LandRecord[] = records.map(r => ({
+      const seenFiles = new Set<string>();
+      const uniqueRecords: typeof records = [];
+      for (const r of records) {
+        if (!seenFiles.has(r.fileName)) {
+          seenFiles.add(r.fileName);
+          uniqueRecords.push(r);
+        }
+      }
+      const mapped: LandRecord[] = uniqueRecords.map(r => ({
         id: r.id,
         fileName: r.fileName,
         fileUrl: r.file_url || undefined,
